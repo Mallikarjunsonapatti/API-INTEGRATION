@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced Weather App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="weather-container">
+    <h2>🌦 Weather App</h2>
+
+    <input type="text" id="city" placeholder="Enter city name">
+
+    <button onclick="getWeather()">🔍 Search</button>
+    <button onclick="getLocation()">📍 Use My Location</button>
+    <button onclick="toggleUnit()">🌡 °C / °F</button>
+    <button onclick="toggleTheme()">🌙 Dark Mode</button>
+
+    <div id="result">
+        <img id="icon" />
+        <h3 id="location"></h3>
+        <p id="temp"></p>
+        <p id="desc"></p>
+        <p id="extra"></p>
+    </div>
+
+    <div id="forecast"></div>
+
+    <p class="credit">Background images from Unsplash</p>
+</div>
+
+<script>
+let unit = "metric";
+let dark = false;
+const apiKey = "7614c5e97823fea0c7bcef39094d79b0";
+
+/* Dark Mode */
+function toggleTheme() {
+    document.body.classList.toggle("dark");
+}
+
+/* Temperature Unit */
+function toggleUnit() {
+    unit = unit === "metric" ? "imperial" : "metric";
+    alert("Temperature unit changed");
+}
+
+/* City Weather */
+async function getWeather() {
+    const city = document.getElementById("city").value;
+    if (!city) return alert("Please enter a city");
+
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${unit}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.cod !== 200) {
+        alert("City not found");
+        return;
+    }
+
+    displayWeather(data);
+    changeBackground(data);
+    getForecast(city);
+}
+
+/* Display Weather */
+function displayWeather(data) {
+    document.getElementById("icon").src =
+        `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+
+    document.getElementById("location").innerText =
+        `${data.name}, ${data.sys.country}`;
+
+    document.getElementById("temp").innerText =
+        `🌡 ${data.main.temp} ${unit === "metric" ? "°C" : "°F"}`;
+
+    document.getElementById("desc").innerText =
+        data.weather[0].description;
+
+    document.getElementById("extra").innerText =
+        `💧 ${data.main.humidity}% | 🌬 ${data.wind.speed}`;
+}
+
+/* ✅ CORRECT BACKGROUND IMAGE LOGIC */
+function changeBackground(data) {
+    const condition = data.weather[0].main.toLowerCase();
+
+    if (condition.includes("cloud")) {
+        document.body.style.backgroundImage = "url('images/cloudy.jpg')";
+    } else if (condition.includes("rain")) {
+        document.body.style.backgroundImage = "url('images/rainy.jpg')";
+    } else if (condition.includes("snow")) {
+        document.body.style.backgroundImage = "url('images/snowy.jpg')";
+    } else if (condition.includes("storm") || condition.includes("thunder")) {
+        document.body.style.backgroundImage = "url('images/stormy.jpg')";
+    } else {
+        document.body.style.backgroundImage = "url('images/sunny.jpg')";
+    }
+}
+
+/* Forecast */
+async function getForecast(city) {
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${unit}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    let html = "<h4>5-Day Forecast</h4>";
+    for (let i = 0; i < data.list.length; i += 8) {
+        const d = data.list[i];
+        html += `
+            <div class="forecast-item">
+                <img src="https://openweathermap.org/img/wn/${d.weather[0].icon}.png">
+                <p>${Math.round(d.main.temp)}°</p>
+            </div>
+        `;
+    }
+    document.getElementById("forecast").innerHTML = html;
+}
+
+/* Location Weather */
+function getLocation() {
+    navigator.geolocation.getCurrentPosition(async pos => {
+        const { latitude, longitude } = pos.coords;
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${unit}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        displayWeather(data);
+        changeBackground(data);
+        getForecast(data.name);
+    });
+}
+</script>
+
+</body>
+</html>
