@@ -27,3 +27,6 @@ Task 4 involves developing a Chrome extension for time tracking and productivity
 Throughout the internship, interns are instructed to maintain all project files in a GitHub repository, follow proper coding standards, and include meaningful comments in the code. The use of online resources such as YouTube, Google, and ChatGPT is encouraged to enhance learning efficiency. Upon successful completion of all four tasks within the given deadline, interns are awarded a completion certificate by CODTECH.
 
 Overall, the CODTECH Full Stack Development Internship provides valuable practical experience and prepares students for future careers in web development and software engineering.
+
+# out put
+![Image](https://github.com/user-attachments/assets/90ef21f5-2ea8-4ee3-9fd5-a215e22b694a)
